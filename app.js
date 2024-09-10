@@ -239,9 +239,20 @@ app.post('/todos/', verifyDataBody, async (request, response) => {
 //update details
 
 app.put('/todos/:todoId/', verifyDataBody, async (request, response) => {
-  const {todo, category, priority, status, dueDate} = request.body
-  let todoDetails = request.body
   const {todoId} = request.params
+
+  const prevTodoQuery = `SELECT * FROM todo WHERE id = ${todoId};`
+  const prevTodo = await db.get(prevTodoQuery)
+
+  const {
+    todo = prevTodo.todo,
+    category = prevTodo.category,
+    priority = prevTodo.priority,
+    status = prevTodo.status,
+    dueDate = prevTodo.dueDate,
+  } = request.body
+  let todoDetails = request.body
+
   let formattedDate
 
   if (dueDate !== undefined) {
@@ -251,15 +262,6 @@ app.put('/todos/:todoId/', verifyDataBody, async (request, response) => {
       formattedDate = format(dateObj, 'yyyy-MM-dd')
     }
   }
-  // if (hasStatus(todoDetails)) {
-  //   if (!['TO DO', 'IN PROGRESS', 'DONE'].includes(status)) {
-  //     response.status(400)
-  //     response.send('Invalid Todo Status')
-  //     return
-  //   }
-  //   getTodosQuery = `UPDATE todo SET status = '${status}' WHERE id = ${todoId};`
-  //   result = 'Status Updated'
-  // }
 
   const hasStatus = queryParams => {
     return queryParams.status !== undefined
