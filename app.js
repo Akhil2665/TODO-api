@@ -27,7 +27,7 @@ const initializeTheServer = async () => {
   }
 }
 initializeTheServer()
-
+///done changes 9/10
 const convertToCamelCase = dbObject => {
   return {
     id: dbObject.id,
@@ -125,16 +125,20 @@ app.get('/todos/', verifyDataQuery, async (request, response) => {
 
       break
     case hasStatusAndPriority(request.query):
-      getTodosQuery = `SELECT * FROM todo WHERE (priority = '${priority}') AND (status = '${status}');`
+      getTodosQuery =
+       `SELECT * FROM todo WHERE (priority = '${priority}') AND (status = '${status}');`
       break
     case hasStatusAndCategory(request.query):
-      getTodosQuery = `SELECT * FROM todo WHERE (category = '${category}') AND (status = '${status}');`
+      getTodosQuery = 
+      `SELECT * FROM todo WHERE (category = '${category}') AND (status = '${status}');`
       break
     case hasPriorityAndCategory(request.query):
-      getTodosQuery = `SELECT * FROM todo WHERE (category = '${category}') AND (priority = '${priority}');`
+      getTodosQuery =
+       `SELECT * FROM todo WHERE (category = '${category}') AND (priority = '${priority}');`
       break
     default:
-      getTodosQuery = `SELECT * FROM todo WHERE todo LIKE '%${search_q}%';`
+      getTodosQuery =
+       `SELECT * FROM todo WHERE todo LIKE '%${search_q}%';`
       break
   }
 
@@ -186,6 +190,7 @@ const verifyDataBody = async (request, response, next) => {
     if (!isValid(dateObj)) {
       response.status(400)
       response.send('Invalid Due Date')
+      return;
     }
   }
 
@@ -195,21 +200,22 @@ const verifyDataBody = async (request, response, next) => {
   ) {
     response.status(400)
     response.send('Invalid Todo Status')
-  } else if (
-    priority !== undefined &&
-    !['HIGH', 'MEDIUM', 'LOW'].includes(priority)
-  ) {
+    return;
+  }
+  if (priority !== undefined && !['HIGH', 'MEDIUM', 'LOW'].includes(priority)) {
     response.status(400)
     response.send('Invalid Todo Priority')
-  } else if (
+    return;
+  }
+  if (
     category !== undefined &&
     !['WORK', 'HOME', 'LEARNING'].includes(category)
   ) {
     response.status(400)
     response.send('Invalid Todo Category')
-  } else {
-    next()
+    return;
   }
+  next()
 }
 
 app.post('/todos/', verifyDataBody, async (request, response) => {
